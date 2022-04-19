@@ -30,7 +30,7 @@ func main() {
 		User:     getEnv("MYSQL_USER", "pos"),
 		Password: getEnv("MYSQL_PASSWORD", "123456"),
 		Host:     getEnv("MYSQL_USER", "127.0.0.1"),
-		Port:     getInt("MYSQL_PORT", 3307),
+		Port:     getInt("MYSQL_PORT", 3306),
 		Name:     getEnv("MYSQL_DBNAME", "pos"),
 	})
 
