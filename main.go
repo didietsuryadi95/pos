@@ -37,6 +37,7 @@ func main() {
 	Migrate(db)
 	defer db.Close()
 
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 	v1 := r.Group("")
 	v1.Use(cashiers.AuthMiddleware(false))
