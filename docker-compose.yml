@@ -1,0 +1,54 @@
+version: '3.4'
+services:
+  #  # back-end api built with golang
+  #  golang:
+  #    build:
+  #      context: golang
+  #      dockerfile: Dockerfile
+  #      target: dev
+  #    volumes:
+  #      - ./golang:/root
+  #    ports:
+  #      - "5000:5000"
+  #    env_file: .env
+  #    depends_on:
+  #      - postgres
+
+  # postgres is our primary data store
+  mysql:
+    container_name : mysql
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: 'pos'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'pos'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: '123456'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: '123456'
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>
+      - '3307:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3307'
+      # Where our data will be persisted
+    volumes:
+      - ../my-db:/var/lib/mysql
+
+#  redis:
+#    image: redis
+#    command: redis-server --requirepass 123456
+#    ports:
+#      - "3456:3456"
+#    container_name: redis
+
+#  # nginx is used for ssl termination
+#  nginx:
+#    build:
+#      context: nginx
+#      target: dev
+#    ports:
+#      - "443:443"
+#    depends_on:
+#      - golang

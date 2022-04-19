@@ -2,11 +2,11 @@ package common
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/postgres"
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"net/url"
 	"os"
+
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
 type Database struct {
@@ -15,22 +15,25 @@ type Database struct {
 
 var DB *gorm.DB
 
-// Opening a database and save the reference to `Database` struct.
-func Init(cfg Configuration) *gorm.DB {
-	dsn := url.URL{
-		User:     url.UserPassword(cfg.Database.User, cfg.Database.Password),
-		Scheme:   "postgres",
-		Host:     fmt.Sprintf("%s:%d", cfg.Database.Host, cfg.Database.Port),
-		Path:     cfg.Database.Name,
-		RawQuery: (&url.Values{"sslmode": []string{"disable"}}).Encode(),
-	}
+type DBConfiguration struct {
+	User     string
+	Password string
+	Host     string
+	Port     int
+	Name     string
+}
 
-	db, err := gorm.Open("postgres", dsn.String())
+// Opening a database and save the reference to `Database` struct.
+func Init(cfg DBConfiguration) *gorm.DB {
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local", cfg.User, cfg.Password,
+		cfg.Host, cfg.Port, cfg.Name)
+
+	db, err := gorm.Open("mysql", dsn)
 	if err != nil {
 		fmt.Println("db err: (Init) ", err)
 	}
 	db.DB().SetMaxIdleConns(10)
-	//db.LogMode(true)
+	// db.LogMode(true)
 	DB = db
 	return DB
 }

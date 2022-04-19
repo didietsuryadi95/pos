@@ -2,8 +2,10 @@
 package common
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -80,4 +82,28 @@ func NewError(key string, err error) CommonError {
 func Bind(c *gin.Context, obj interface{}) error {
 	b := binding.Default(c.Request.Method, c.ContentType())
 	return c.ShouldBindWith(obj, b)
+}
+
+func BaseResponse(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Success", "data": data})
+}
+
+func BaseResponseNotFound(c *gin.Context, message string) {
+	c.JSON(http.StatusNotFound, gin.H{"success": false, "message": message, "error": errors.New("")})
+}
+
+func BaseResponseErrors(c *gin.Context, errors interface{}) {
+	c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": "data not valid", "error": errors})
+}
+
+func BaseResponseUnautorized(c *gin.Context, errors interface{}) {
+	c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "data not valid", "error": errors})
+}
+
+func BaseResponseUnauthorized(c *gin.Context, errors interface{}) {
+	c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"success": false, "message": "Unauthorized", "error": errors})
+}
+
+func BaseResponseStatusOnly(c *gin.Context, status bool, message string) {
+	c.JSON(http.StatusOK, gin.H{"success": status, "message": message})
 }
