@@ -97,7 +97,7 @@ func BaseResponseErrors(c *gin.Context, errors interface{}) {
 }
 
 func BaseResponseUnautorized(c *gin.Context, errors interface{}) {
-	c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": "data not valid", "error": errors})
+	c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": errors, "error": errors})
 }
 
 func BaseResponseUnauthorized(c *gin.Context, errors interface{}) {

@@ -1,7 +1,6 @@
 package products
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -27,12 +26,12 @@ func DeleteProduct(c *gin.Context) {
 	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	id := uint(id64)
 	if err != nil {
-		common.BaseResponseErrors(c, "Invalid Id")
+		common.BaseResponseNotFound(c, "Product Not Found")
 		return
 	}
 	err = Delete(&ProductModel{Model: gorm.Model{ID: uint(id)}})
 	if err != nil {
-		common.BaseResponseErrors(c, "Invalid Id")
+		common.BaseResponseNotFound(c, "Product Not Found")
 		return
 	}
 	common.BaseResponseStatusOnly(c, true, "Success")
@@ -42,13 +41,13 @@ func UpdateProduct(c *gin.Context) {
 	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	id := uint(id64)
 	if err != nil {
-		common.BaseResponseErrors(c, "Invalid Id")
+		common.BaseResponseNotFound(c, "Product Not Found")
 		return
 	}
 
 	productModel, err := FindOneProduct(&ProductModel{Model: gorm.Model{ID: uint(id)}})
 	if err != nil {
-		c.JSON(http.StatusNotFound, common.NewError("categories", errors.New("Invalid slug")))
+		common.BaseResponseNotFound(c, "Product Not Found")
 		return
 	}
 	productModelValidator := NewProductModelValidatorFillWith(productModel)
@@ -58,7 +57,7 @@ func UpdateProduct(c *gin.Context) {
 	}
 
 	if err := productModel.Update(productModel.ID, productModelValidator.productModel); err != nil {
-		c.JSON(http.StatusUnprocessableEntity, common.NewError("database", err))
+		common.BaseResponseNotFound(c, "Product Not Found")
 		return
 	}
 
@@ -92,7 +91,9 @@ func CreateProduct(c *gin.Context) {
 func GetProductList(c *gin.Context) {
 	limit := c.Query("limit")
 	offset := c.Query("skip")
-	productModels, modelCount, limitInt, offsetInt, err := FindManyProduct(limit, offset)
+	keyword := c.Query("q")
+	categoryId := c.Query("categoryId")
+	productModels, modelCount, limitInt, offsetInt, err := FindManyProduct(limit, offset, keyword, categoryId)
 	if err != nil {
 		common.BaseResponseErrors(c, "Invalid Id")
 		return

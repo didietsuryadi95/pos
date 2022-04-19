@@ -1,6 +1,7 @@
 package products
 
 import (
+	"fmt"
 	"strconv"
 	"time"
 
@@ -60,7 +61,7 @@ func FindOneDiscount(condition interface{}) (DiscountModel, error) {
 	return model, err
 }
 
-func FindManyProduct(limit, offset string) ([]ProductModel, int, int, int, error) {
+func FindManyProduct(limit, offset, keyword, categoryId string) ([]ProductModel, int, int, int, error) {
 	db := common.GetDB()
 	var models []ProductModel
 	var count int
@@ -77,6 +78,21 @@ func FindManyProduct(limit, offset string) ([]ProductModel, int, int, int, error
 
 	tx := db.Begin()
 	db.Model(&models).Count(&count)
+	categoryIdInt, err := strconv.Atoi(categoryId)
+	if err == nil {
+		categoryIdInt = 0
+	}
+
+	if keyword != "" && categoryIdInt != 0 {
+		db.Where("name LIKE ?", fmt.Sprint("%", keyword, "%")).Where("category_id = ?", categoryIdInt)
+	} else if keyword != "" {
+		db.Where("name LIKE ?", fmt.Sprint("%", keyword, "%"))
+	} else if categoryIdInt != 0 {
+		categoryIdInt, err := strconv.Atoi(categoryId)
+		if err == nil {
+			db.Where("category_id = ?", categoryIdInt)
+		}
+	}
 	db.Offset(offset_int).Limit(limit_int).Find(&models)
 	err = tx.Commit().Error
 	return models, count, limit_int, offset_int, err

@@ -24,12 +24,12 @@ func DeletePayment(c *gin.Context) {
 	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	id := uint(id64)
 	if err != nil {
-		common.BaseResponseErrors(c, "Invalid Id")
+		common.BaseResponseNotFound(c, "Payment Not Found")
 		return
 	}
 	err = Delete(&PaymentModel{Model: gorm.Model{ID: uint(id)}})
 	if err != nil {
-		common.BaseResponseErrors(c, "Invalid Id")
+		common.BaseResponseNotFound(c, "Payment Not Found")
 		return
 	}
 	common.BaseResponseStatusOnly(c, true, "Success")
@@ -39,13 +39,13 @@ func UpdatePayment(c *gin.Context) {
 	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	id := uint(id64)
 	if err != nil {
-		common.BaseResponseErrors(c, "Invalid Id")
+		common.BaseResponseNotFound(c, "Payment Not Found")
 		return
 	}
 
 	paymentModel, err := FindOnePayment(&PaymentModel{Model: gorm.Model{ID: uint(id)}})
 	if err != nil {
-		common.BaseResponseErrors(c, "Invalid Id")
+		common.BaseResponseNotFound(c, "Payment Not Found")
 		return
 	}
 	paymentModelValidator := NewPaymentModelValidatorFillWith(paymentModel)

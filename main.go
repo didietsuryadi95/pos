@@ -53,7 +53,7 @@ func main() {
 	categories.RouteAuth(v1.Group("/categories"))
 	products.RouteAuth(v1.Group("/products"))
 
-	r.Run(fmt.Sprintf("127.0.0.1:3030"))
+	r.Run(fmt.Sprintf("0.0.0.0:3030"))
 }
 
 func getEnv(key, fallback string) string {

@@ -37,7 +37,7 @@ func LogoutCashier(c *gin.Context) {
 
 	cashierModel, err := FindOneCashier(&CashierModel{Model: gorm.Model{ID: uint(idInt)}, Passcode: authModelValidator.Passcode})
 
-	if err != nil || cashierModel.ID != uint(idInt) {
+	if err != nil || cashierModel.ID == 0 {
 		common.BaseResponseUnautorized(c, "Passcode Not Match")
 		return
 	}
@@ -61,7 +61,7 @@ func LoginCashier(c *gin.Context) {
 
 	cashierModel, err := FindOneCashier(&CashierModel{Model: gorm.Model{ID: uint(idInt)}, Passcode: authModelValidator.Passcode})
 
-	if err != nil || cashierModel.ID != uint(idInt) {
+	if err != nil || cashierModel.ID == 0 {
 		common.BaseResponseUnautorized(c, "Passcode Not Match")
 		return
 	}
@@ -78,8 +78,8 @@ func GetPassCode(c *gin.Context) {
 	}
 
 	cashierModel, err := FindOneCashier(&CashierModel{Model: gorm.Model{ID: uint(idInt)}})
-	if err != nil {
-		c.JSON(http.StatusNotFound, common.NewError("cashiers", errors.New("Invalid id")))
+	if err != nil || cashierModel.ID == 0 {
+		common.BaseResponseNotFound(c, "Cashier Not Found")
 		return
 	}
 
@@ -90,12 +90,12 @@ func DeleteCashier(c *gin.Context) {
 	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	id := uint(id64)
 	if err != nil {
-		c.JSON(http.StatusNotFound, common.NewError("cashiers", errors.New("Invalid id")))
+		common.BaseResponseNotFound(c, "Cashier Not Found")
 		return
 	}
 	err = Delete(&CashierModel{Model: gorm.Model{ID: uint(id)}})
 	if err != nil {
-		c.JSON(http.StatusNotFound, common.NewError("cashiers", errors.New("Invalid id")))
+		common.BaseResponseNotFound(c, "Cashier Not Found")
 		return
 	}
 	common.BaseResponseStatusOnly(c, true, "Success")
@@ -105,13 +105,13 @@ func UpdateCashier(c *gin.Context) {
 	id64, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	id := uint(id64)
 	if err != nil {
-		c.JSON(http.StatusNotFound, common.NewError("cashiers", errors.New("Invalid id")))
+		common.BaseResponseNotFound(c, "Cashier Not Found")
 		return
 	}
 
 	cashierModel, err := FindOneCashier(&CashierModel{Model: gorm.Model{ID: uint(id)}})
 	if err != nil {
-		c.JSON(http.StatusNotFound, common.NewError("cashiers", errors.New("Invalid slug")))
+		common.BaseResponseNotFound(c, "Cashier Not Found")
 		return
 	}
 	cashierModelValidator := NewCashierModelValidatorFillWith(cashierModel)
@@ -121,7 +121,7 @@ func UpdateCashier(c *gin.Context) {
 	}
 
 	if err := cashierModel.Update(cashierModel.ID, cashierModelValidator.cashierModel); err != nil {
-		c.JSON(http.StatusBadRequest, common.NewError("database", err))
+		common.BaseResponseNotFound(c, "Cashier Not Found")
 		return
 	}
 
