@@ -19,9 +19,9 @@ services:
     container_name : mysql
     image: mysql:5.7
     environment:
-      MYSQL_DATABASE: 'pos'
+      MYSQL_DATABASE: 'pos2'
       # So you don't have to use root, but you can if you like
-      MYSQL_USER: 'pos'
+      MYSQL_USER: 'pos2'
       # You can use whatever password you like
       MYSQL_PASSWORD: '123456'
       # Password for root access

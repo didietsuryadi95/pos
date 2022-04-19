@@ -1,6 +1,11 @@
 ARG GO_VERSION=1.18
 
 FROM golang:${GO_VERSION}-alpine AS builder
+ENV MYSQL_PASSWORD=$(MYSQL_PASSWORD)
+ENV MYSQL_USER=$(MYSQL_USER)
+ENV MYSQL_HOST=$(MYSQL_HOST)
+ENV MYSQL_DBNAME=$(MYSQL_DBNAME)
+ENV MYSQL_PORT=$(MYSQL_PORT)
 
 RUN apk update && apk add alpine-sdk git && rm -rf /var/cache/apk/*
 
